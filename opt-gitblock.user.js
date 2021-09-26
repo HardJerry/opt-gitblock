@@ -12,6 +12,9 @@
 // @grant        GM_listValues
 // ==/UserScript==
 
+
+(function () {
+  //================== Global Func =====================
   $("body").prepend(`
 <script>function dat_alert(title,name,useTime,markdown) {
         $("body").after(\`
@@ -55,7 +58,7 @@
 
   //================== Redlist =====================
 
-  if (url.search("/Users") != -1) {
+  if (url.search("/Users/") != -1) {
     //console.log("In user home, verify redlist");
     var libraLib = {
       isInList: function (id) {
@@ -105,11 +108,10 @@
       if (cidel.length === 0) {
         var commentId = this.id;
         $('> div.comment_info_2Sjc0 > div:nth-child(2)', this).append(
-          ` <a href="` + location.pathname + `#commentId=` + commentId + `" class="` + COMMENT_ID_CLASS + `">#` + commentId + `</a>`);
+          ` <a href="` + location.pathname + `#commentId=` + commentId + `" class="` + COMMENT_ID_CLASS + `">Comment</a>`);
       }
     });
   }, 2500);
-
 
   //================== View Markdown =====================
 
@@ -129,10 +131,34 @@
           async: false,
           success: function (result) {
             var markdown = "<pre><code>" + result.user.abstract.replace(/\n/g, "</br>") + "</code></pre>";
-            dat_alert("Markdown 原文", result.user.username, "#" + uid, markdown);
+            dat_alert("Markdown 源代码", result.user.username, "#" + uid, markdown);
           },
         });
       })
     }
   }
+    //================== 阻止滚轮 =====================
+    var button;
+    if(window.location.href.search("kada.163.com") != -1) {
+        button = "stage-header_stage-button-icon_3zzFK";
+    }else if(window.location.href.search(/(gitblock.cn)|(aerfaying.com)/) != -1) {
+        button = "stage-header_stage-button-icon_1SHv0";
+    }else if(window.location.href.search("ccw.site") != -1) {
+        button = "stage-header_stage-button-icon_3zzFK";
+    }
+
+    var scrollFunction = function(e) {
+        if(document.getElementsByClassName(button).length > 0) {
+            if(document.getElementsByClassName(button)[0].alt == "退出全屏模式"){
+                e = e || window.event;
+                e.preventDefault && e.preventDefault();
+            }
+        }
+    }
+    if (document.addEventListener) {
+        document.addEventListener('DOMMouseScroll', scrollFunction, false);
+    }
+    window.addEventListener('mousewheel', scrollFunction, {
+        passive: false
+    });
 })();
